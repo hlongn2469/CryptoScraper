@@ -6,6 +6,7 @@
 ![Sample output](https://github.com/hlongn2469/CoinScraper/blob/main/Screenshot%202021-04-28%20134430.png)
 
 ## Prerequisites/Requirements
-* Eclipse 
-* Java
-* Dependencies
+* Eclipse IDE 2021‑03: https://www.eclipse.org/downloads/
+* Java 8: https://www.java.com/en/
+* Dependencies:
+   -
