@@ -1,20 +1,41 @@
-import java.io.File;
+// ============================================================================
+// scraper.java
+// Coinscraper project/ Cobalt Challenge
+// Author: Kray Nguyen
+// version 1
+// date: 4/28/2021
+// ============================================================================
+
+// a lot of imports, but necessary
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class scraper{
 	
+	// ============================================================================
+	// Request url access, get information of each coin, create new token object, 
+	// then add that coin into an arrayList for storing purposes.
+	// Finally, print to CSV file
+	// ============================================================================
     public static void main(String[] args){
     	// arrayList data structure to contain each coin
     	ArrayList<token> list = new ArrayList<token>();
-    	
-        
-        
+    	  
         try {
+        	// url request
         	String url = "https://coinmarketcap.com/all/views/all/";
         	Document doc = Jsoup.connect(url).get();
         	
@@ -35,7 +56,6 @@ public class scraper{
         			// get price
         			String price = row.select(".cmc-table__cell--sort-by__price.cmc-table__cell--right.cmc-table__cell--sortable.cmc-table__cell").text();
        	
-        	
         			// get circulating supply from url
         			String circ_supply = row.select(".cmc-table__cell--sort-by__circulating-supply.cmc-table__cell--right.cmc-table__cell--sortable.cmc-table__cell").text();
         			
@@ -62,7 +82,7 @@ public class scraper{
         		}
         		
         	}
-        	
+      
         	printCSV(list);
         	
         	
@@ -73,15 +93,62 @@ public class scraper{
        
     }
     
-    public static void printCSV(ArrayList<token> list) {
-    	File csvFile = new File("coin.csv");
+ // ============================================================================
+ // 
+ // ============================================================================
+    
+    public static void printCSV(ArrayList<token> list) throws IOException {
     	try {
-			PrintWriter out = new PrintWriter(csvFile);
-			for(token coin: list) {
-				out.printf("%s, %s, %s, %s, %s, %s, %s, %s, %s\n", coin.getName(), coin.getSymbol(), coin.getMarketCap(), coin.getPrice(),
-						coin.getCircSupply(), coin.getVol(), coin.getHourChange(), coin.getDayChange(), coin.getWeekChange());
-			}
-			out.close();
+    		// for excel headers
+    		String[] columns = { "Name", "Symbol", "Market cap", "Price", "Circulating supply",
+					"Volume(24h)", "%1h", "%24h", "%7d"};
+    		
+    		// create excel workbook and format it
+    		Workbook excel = new XSSFWorkbook();
+    		Sheet sheet = excel.createSheet("token");
+    		Font header = excel.createFont();
+    		header.setBold(true);
+    		header.setFontHeightInPoints((short)17);
+    		header.setColor(IndexedColors.RED.getIndex());
+    		CellStyle headerCellStyle = excel.createCellStyle();
+    		headerCellStyle.setFont(header);
+    		
+    		// set up header row in excel file
+    		Row header_row = sheet.createRow(0);
+    		for(int i = 0; i < columns.length;i++) {
+    			Cell cell = header_row.createCell(i);
+    			cell.setCellValue(columns[i]);
+    			cell.setCellStyle(headerCellStyle);
+    		}
+    		
+    		// fill in coin info in excel
+    		int row_num = 1;
+    		for(token coin: list) {
+    			Row row = sheet.createRow(row_num++);
+    			row.createCell(0).setCellValue(coin.getName());
+    			row.createCell(1).setCellValue(coin.getSymbol());
+    			row.createCell(2).setCellValue(coin.getMarketCap());
+    			row.createCell(3).setCellValue(coin.getPrice());
+    			row.createCell(4).setCellValue(coin.getCircSupply());
+    			row.createCell(5).setCellValue(coin.getVol());
+    			row.createCell(6).setCellValue(coin.getHourChange());
+    			row.createCell(7).setCellValue(coin.getDayChange());
+    			row.createCell(8).setCellValue(coin.getWeekChange());
+    		}
+    		
+    		// resize cell if necessary
+    		for(int i = 0; i < columns.length;i++) {
+    			sheet.autoSizeColumn(i);
+    		}
+    		
+    		// write to xlsx file
+    		FileOutputStream fileOut = new FileOutputStream("coin.xlsx");
+    		excel.write(fileOut);
+    		
+    		// close files
+    		fileOut.close();
+    		excel.close();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
