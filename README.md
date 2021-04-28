@@ -16,4 +16,5 @@
    * commons-collections: https://commons.apache.org/proper/commons-collections/download_collections.cgi
 
 ## Usage
-Clone this repo and run scraper.java as main application in the eclipse IDE
+* Clone this repo and run scraper.java as main application in the eclipse IDE
+* After compilation, check your workspace folder for the excel file
