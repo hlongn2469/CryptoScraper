@@ -14,3 +14,6 @@
    * XML beans: http://xmlbeans.apache.org/
    * commons-compress: https://commons.apache.org/proper/commons-compress/download_compress.cgi
    * commons-collections: https://commons.apache.org/proper/commons-collections/download_collections.cgi
+
+## Usage
+Clone this repo and run scraper.java as main application in the eclipse IDE
